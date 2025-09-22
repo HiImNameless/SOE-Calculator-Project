@@ -9,7 +9,7 @@ builder.Services.AddControllersWithViews();
 // For connecting the application to the pgsql database
 builder.Services.AddDbContext<CalculatorDbContext>(options =>
 {
-    options.UseNpgsql("User ID=postgres;Password=65953Mvz;Host=localhost;Port=5432;Database=CalculatorDB;Pooling=true;Minimum Pool Size=0;Maximum Pool Size=20;");
+    options.UseNpgsql("User ID=postgres;Password=!#!65953Mvz!#!;Host=localhost;Port=5432;Database=CalculatorDB;Pooling=true;Minimum Pool Size=0;Maximum Pool Size=20;");
 });
 
 builder.Services.AddControllersWithViews();
