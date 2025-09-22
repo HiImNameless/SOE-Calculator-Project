@@ -12,6 +12,14 @@ builder.Services.AddDbContext<CalculatorDbContext>(options =>
     options.UseNpgsql("User ID=postgres;Password=65953Mvz;Host=localhost;Port=5432;Database=CalculatorDB;Pooling=true;Minimum Pool Size=0;Maximum Pool Size=20;");
 });
 
+builder.Services.AddControllersWithViews();
+builder.Services.AddSession(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.IdleTimeout = TimeSpan.FromMinutes(10);
+    options.Cookie.IsEssential = true;
+});
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
@@ -22,11 +30,9 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
+app.UseSession();
 app.UseAuthorization();
-
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
