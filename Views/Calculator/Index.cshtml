@@ -32,6 +32,18 @@
                         <input id="display" class="form-control form-control-lg text-end" type="text" placeholder="0" aria-label="Display" readonly />
                     </div>
 
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="btn-group btn-group-sm" role="group" aria-label="Mode">
+                            <button id="mode-basic" class="btn btn-outline-secondary active">Arithmetic</button>
+                            <button id="mode-sci" class="btn btn-outline-secondary">Scientific</button>
+                        </div>
+                        <!-- Optional: degrees/radians toggle (comment out if you don’t want it) -->
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="degToggle" checked>
+                            <label class="form-check-label small" for="degToggle">Degrees</label>
+                        </div>
+                    </div>
+
                     <!-- Keypad -->
                     <div class="row g-2">
                         <div class="col-3"><button class="btn btn-light w-100" data-act="clear">C</button></div>
@@ -60,6 +72,24 @@
                         <div class="col-3"><button class="btn btn-success w-100" data-act="equals">=</button></div>
                     </div>
 
+                    <!-- Scientific keypad (hidden in arithmetic mode) -->
+                    <div id="sci-rows" class="row g-2 d-none">
+                        <div class="col-3"><button class="btn btn-light w-100" data-fn="sin">sin</button></div>
+                        <div class="col-3"><button class="btn btn-light w-100" data-fn="cos">cos</button></div>
+                        <div class="col-3"><button class="btn btn-light w-100" data-fn="tan">tan</button></div>
+                        <div class="col-3"><button class="btn btn-light w-100" data-fn="sqrt">√</button></div>
+
+                        <div class="col-3"><button class="btn btn-light w-100" data-const="pi">π</button></div>
+                        <div class="col-3"><button class="btn btn-light w-100" data-const="e">e</button></div>
+                        <div class="col-3"><button class="btn btn-light w-100" data-op="^">xʸ</button></div>
+                        <div class="col-3"><button class="btn btn-light w-100" data-op="%">%</button></div>
+
+                        <div class="col-3"><button class="btn btn-light w-100" data-fn="log10">log</button></div>
+                        <div class="col-3"><button class="btn btn-light w-100" data-fn="ln">ln</button></div>
+                        <div class="col-3"><button class="btn btn-light w-100" data-op="!">n!</button></div>
+                        <div class="col-3"><button class="btn btn-light w-100" data-fn="pow2">x²</button></div>
+                    </div>
+
                     <hr class="my-3" />
 
                     <!-- Actions -->
@@ -68,14 +98,12 @@
                             @Html.AntiForgeryToken()
                             <input name="expression" id="sessionExpression" type="hidden" />
                             <input name="result" id="sessionResult" type="hidden" />
-                            <button type="submit" class="btn btn-outline-primary">Add to Session</button>
                         </form>
 
                         <form id="saveForm" asp-action="Save" method="post" class="d-inline">
                             @Html.AntiForgeryToken()
                             <input name="expression" id="saveExpression" type="hidden" />
                             <input name="result" id="saveResult" type="hidden" />
-                            <button type="submit" class="btn btn-primary">Save</button>
                         </form>
                     </div>
                 </div>
@@ -143,8 +171,12 @@
                                                 <div class="text-muted">= @row.Result</div>
                                             </div>
                                             <div class="text-nowrap">
-                                                <a asp-action="EditHistory" asp-route-id="@row.Id" class="btn btn-sm btn-outline-primary">Edit</a>
-                                                <a asp-action="Delete" asp-route-id="@row.Id" class="btn btn-sm btn-outline-danger ms-1">Delete</a>
+                                                <form asp-action="DeleteConfirmed" method="post" class="d-inline">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@row.Id" />
+                                                    <button type="submit" class="btn btn-sm btn-danger ms-1">Delete</button>
+                                                </form >
+
                                             </div>
                                         </div>
                                     </div>
@@ -174,8 +206,12 @@
 <script>
     (() => {
         const display = document.getElementById('display');
-        const allowed = /^[0-9+\-*/().\s]+$/;
+        const allowed = /^[0-9+\-*/().\s^%!a-zA-Z,]+$/;
 
+        const sciRows = document.getElementById('sci-rows');
+        const modeBasic = document.getElementById('mode-basic');
+        const modeSci = document.getElementById('mode-sci');
+        const degToggle = document.getElementById('degToggle');
         const btnSession = document.getElementById('btnSession');
         const btnSaved = document.getElementById('btnSaved');
         const panelSession = document.getElementById('panelSession');
@@ -198,58 +234,152 @@
         btnSession.addEventListener('click', () => showPanel('session'));
         btnSaved.addEventListener('click', () => showPanel('saved'));
 
-        function write(val) { display.value += val; }
-        function backspace() { display.value = display.value.slice(0, -1); }
-        function clearAll() { display.value = ''; }
+              // ----- Mode toggle -----
+      function setMode(sci) {
+        if (sci) {
+          sciRows.classList.remove('d-none');
+          modeSci.classList.add('active');
+          modeBasic.classList.remove('active');
+        } else {
+          sciRows.classList.add('d-none');
+          modeBasic.classList.add('active');
+          modeSci.classList.remove('active');
+        }
+      }
+      modeBasic.addEventListener('click', () => setMode(false));
+      modeSci.addEventListener('click', () => setMode(true));
 
-        function compute() {
-            const exprRaw = display.value.trim();
-            if (!exprRaw) return null;
+      // ----- Helpers -----
+      function write(val) { display.value += val; }
+      function backspace() { display.value = display.value.slice(0, -1); }
+      function clearAll() { display.value = ''; }
 
-            const expr = exprRaw.replace(/×/g, '*').replace(/÷/g, '/');
-            if (!allowed.test(expr)) { alert('Invalid characters in expression.'); return null; }
+      // Insert function names nicely: clicking 'sin' writes "sin(" etc.
+      function insertFunction(name) {
+        const map = {
+          sin: 'sin(', cos: 'cos(', tan: 'tan(',
+          sqrt: 'sqrt(', log10: 'log(', ln: 'ln(', pow2: '^2'
+        };
+        write(map[name] ?? '');
+      }
+      function insertConst(name) {
+        if (name === 'pi') write('π');
+        else if (name === 'e') write('e');
+      }
+      function insertOp(op) {
+        if (op === '^') write('^');
+        else if (op === '%') write('%');
+        else if (op === '!') write('!');
+      }
 
-            try {
-                const result = Function(`"use strict"; return (${expr});`)();
-                if (typeof result !== 'number' || !isFinite(result)) throw new Error('NaN');
-                return { expr: exprRaw, result: String(result) };
-            } catch {
-                alert('Invalid expression.');
-                return null;
-            }
+      // ----- Safe-ish compute with preprocessing -----
+      function compute() {
+        let exprRaw = display.value.trim();
+        if (!exprRaw) return null;
+
+        // Normalize symbols
+        let expr = exprRaw
+          .replace(/×/g, '*')
+          .replace(/÷/g, '/')
+          .replace(/π/g, 'PI')
+          .replace(/√/g, 'sqrt');
+
+        if (!allowed.test(expr)) {
+          alert('Invalid characters in expression.');
+          return null;
         }
 
-        document.addEventListener('click', (e) => {
-            const btn = e.target.closest('button');
-            if (!btn) return;
+        // Replace functions with Math.* and handle degrees if enabled
+        const useDegrees = !!degToggle?.checked;
 
-            const key = btn.getAttribute('data-key');
-            const act = btn.getAttribute('data-act');
+        // Handle factorial: turn "n!" into "fact(n)"
+        // Supports nested: 5!! won’t be supported; single factorial only.
+        expr = expr.replace(/(\d+(?:\.\d+)?)\s*!/g, (_m, n) => `fact(${n})`);
 
-            if (key) { write(key); return; }
-            if (act === 'backspace') { backspace(); return; }
-            if (act === 'clear') { clearAll(); return; }
-            if (act === 'equals') {
-                const payload = compute();
-                if (!payload) return;
+        // Power operator: a^b -> Math.pow(a,b)
+        // Replace ^ with ** for JS, simpler & safe in Function. But we’ll still clamp with Math.pow if you prefer.
+        expr = expr.replace(/\^/g, '**');
 
-                // push to both hidden forms
-                document.getElementById('sessionExpression').value = payload.expr;
-                document.getElementById('sessionResult').value = payload.result;
-                document.getElementById('saveExpression').value = payload.expr;
-                document.getElementById('saveResult').value = payload.result;
+        // Percent: treat trailing % as /100 (e.g., 50% => 0.5)
+        expr = expr.replace(/(\d+(?:\.\d+)?)%/g, (_m, n) => `(${n}/100)`);
 
-                // Auto-add to session on "=" (optional)
-                document.getElementById('sessionForm').submit();
-            }
-        });
+        // Map names to Math.*, and provide degree-aware wrappers
+        // We’ll allow sin,cos,tan,log,ln,sqrt explicitly, and PI/e as constants.
+        const pre = `
+          const PI = Math.PI;
+          const e = Math.E;
+          const rad = (deg) => (deg * PI / 180);
+          const sin = (x) => Math.sin(${useDegrees ? 'rad(x)' : 'x'});
+          const cos = (x) => Math.cos(${useDegrees ? 'rad(x)' : 'x'});
+          const tan = (x) => Math.tan(${useDegrees ? 'rad(x)' : 'x'});
+          const sqrt = (x) => Math.sqrt(x);
+          const log  = (x) => Math.log10(x);
+          const ln   = (x) => Math.log(x);
+          const fact = (n) => {
+            n = Number(n);
+            if (!Number.isInteger(n) || n < 0) throw new Error('Invalid factorial');
+            let r = 1; for (let i=2;i<=n;i++) r*=i; return r;
+          };
+        `;
 
-        // Keyboard support
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') { e.preventDefault(); document.querySelector('[data-act="equals"]')?.click(); }
-            else if (e.key === 'Backspace') { e.preventDefault(); backspace(); }
-            else if (e.key === 'Escape') { e.preventDefault(); clearAll(); }
-            else if (/^[0-9+\-*/().]$/.test(e.key)) { e.preventDefault(); write(e.key); }
-        });
+        // Evaluate with a tightly-scoped Function
+        try {
+          // eslint-disable-next-line no-new-func
+          const fn = Function(`"use strict"; ${pre}; return (${expr});`);
+          const result = fn();
+          if (typeof result !== 'number' || !isFinite(result)) throw new Error('NaN');
+          return { expr: exprRaw, result: String(result) };
+        } catch (e) {
+          alert('Invalid expression.');
+          return null;
+        }
+      }
+
+      // ----- Button handling -----
+      document.addEventListener('click', (e) => {
+        const btn = e.target.closest('button');
+        if (!btn) return;
+
+        // existing keys
+        const key = btn.getAttribute('data-key');
+        const act = btn.getAttribute('data-act');
+
+        // scientific inserts
+        const fn  = btn.getAttribute('data-fn');
+        const cst = btn.getAttribute('data-const');
+        const op  = btn.getAttribute('data-op');
+
+        if (key) { write(key); return; }
+        if (fn) { insertFunction(fn); return; }
+        if (cst) { insertConst(cst); return; }
+        if (op) { insertOp(op); return; }
+
+        if (act === 'backspace') { backspace(); return; }
+        if (act === 'clear') { clearAll(); return; }
+        if (act === 'equals') {
+          const payload = compute();
+          if (!payload) return;
+
+          // push to both hidden forms you already have
+          document.getElementById('sessionExpression').value = payload.expr;
+          document.getElementById('sessionResult').value = payload.result;
+          document.getElementById('saveExpression').value = payload.expr;
+          document.getElementById('saveResult').value = payload.result;
+
+          // Auto-add to session on "="
+          document.getElementById('sessionForm').submit();
+        }
+      });
+
+      // ----- Keyboard support (basic keys + ^) -----
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); document.querySelector('[data-act="equals"]')?.click(); }
+        else if (e.key === 'Backspace') { e.preventDefault(); backspace(); }
+        else if (e.key === 'Escape') { e.preventDefault(); clearAll(); }
+        else if (/^[0-9+\-*/().^]$/.test(e.key)) { e.preventDefault(); write(e.key); }
+      });
+
+      // default mode = Arithmetic
+      setMode(false);
     })();
 </script>

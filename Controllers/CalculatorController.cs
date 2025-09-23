@@ -225,7 +225,7 @@ namespace SOE_Calculator_Controller.Controllers
 
             var list = await _db.SavedCalculations.Where(c => c.UserId == userId.Value).OrderByDescending(c => c.Id).ToListAsync();
 
-            return View(Index);
+            return View();
         }
 
         // Used to save a calculation directly into the database
