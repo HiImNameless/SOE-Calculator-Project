@@ -1,8 +1,255 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model SOE_Calculator_Project.Models.CalculatorPageVM
+@{
+    ViewData["Title"] = "Calculator";
 }
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 mb-0">Calculator</h1>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Info"] != null)
+    {
+        <div class="alert alert-info">@TempData["Info"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <div class="row g-4">
+        <!-- Left: Calculator -->
+        <div class="col-12 col-lg-7">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <!-- Display -->
+                    <div class="mb-3">
+                        <input id="display" class="form-control form-control-lg text-end" type="text" placeholder="0" aria-label="Display" readonly />
+                    </div>
+
+                    <!-- Keypad -->
+                    <div class="row g-2">
+                        <div class="col-3"><button class="btn btn-light w-100" data-act="clear">C</button></div>
+                        <div class="col-3"><button class="btn btn-light w-100" data-key="(">(</button></div>
+                        <div class="col-3"><button class="btn btn-light w-100" data-key=")">)</button></div>
+                        <div class="col-3"><button class="btn btn-warning w-100" data-key="/">÷</button></div>
+
+                        <div class="col-3"><button class="btn btn-outline-secondary w-100" data-key="7">7</button></div>
+                        <div class="col-3"><button class="btn btn-outline-secondary w-100" data-key="8">8</button></div>
+                        <div class="col-3"><button class="btn btn-outline-secondary w-100" data-key="9">9</button></div>
+                        <div class="col-3"><button class="btn btn-warning w-100" data-key="*">×</button></div>
+
+                        <div class="col-3"><button class="btn btn-outline-secondary w-100" data-key="4">4</button></div>
+                        <div class="col-3"><button class="btn btn-outline-secondary w-100" data-key="5">5</button></div>
+                        <div class="col-3"><button class="btn btn-outline-secondary w-100" data-key="6">6</button></div>
+                        <div class="col-3"><button class="btn btn-warning w-100" data-key="-">−</button></div>
+
+                        <div class="col-3"><button class="btn btn-outline-secondary w-100" data-key="1">1</button></div>
+                        <div class="col-3"><button class="btn btn-outline-secondary w-100" data-key="2">2</button></div>
+                        <div class="col-3"><button class="btn btn-outline-secondary w-100" data-key="3">3</button></div>
+                        <div class="col-3"><button class="btn btn-warning w-100" data-key="+">+</button></div>
+
+                        <div class="col-3"><button class="btn btn-outline-secondary w-100" data-key="0">0</button></div>
+                        <div class="col-3"><button class="btn btn-outline-secondary w-100" data-key=".">.</button></div>
+                        <div class="col-3"><button class="btn btn-secondary w-100" data-act="backspace">⌫</button></div>
+                        <div class="col-3"><button class="btn btn-success w-100" data-act="equals">=</button></div>
+                    </div>
+
+                    <hr class="my-3" />
+
+                    <!-- Actions -->
+                    <div class="d-flex flex-wrap gap-2">
+                        <form id="sessionForm" asp-action="AddToSessionHistory" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <input name="expression" id="sessionExpression" type="hidden" />
+                            <input name="result" id="sessionResult" type="hidden" />
+                            <button type="submit" class="btn btn-outline-primary">Add to Session</button>
+                        </form>
+
+                        <form id="saveForm" asp-action="Save" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <input name="expression" id="saveExpression" type="hidden" />
+                            <input name="result" id="saveResult" type="hidden" />
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Sidebar -->
+        <div class="col-12 col-lg-5">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex gap-2 mb-3">
+                        <button id="btnSession" class="btn btn-outline-secondary btn-sm active">Session History</button>
+                        <button id="btnSaved" class="btn btn-outline-secondary btn-sm">Saved</button>
+                        <div class="ms-auto">
+                            <!-- Contextual action area -->
+                            <form id="clearSessionForm" asp-action="ClearSessionHistory" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button class="btn btn-outline-danger btn-sm" title="Clear session history">Clear Session</button>
+                            </form>
+                            <a asp-action="Saved" class="btn btn-outline-primary btn-sm ms-1" title="Open full saved list">Open Saved Page</a>
+                        </div>
+                    </div>
+
+                    <!-- Session List -->
+                    <div id="panelSession">
+                        @if (Model.SessionHistory.Any())
+                        {
+                            <div class="list-group list-group-flush">
+                                @foreach (var row in Model.SessionHistory)
+                                {
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div class="small">
+                                            <div><strong>@row.Expression</strong></div>
+                                            <div class="text-muted">= @row.Result</div>
+                                        </div>
+                                        <div class="text-nowrap">
+                                            <form asp-action="Save" method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="expression" value="@row.Expression" />
+                                                <input type="hidden" name="result" value="@row.Result" />
+                                                <button type="submit" class="btn btn-sm btn-outline-primary">Save</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-muted">No items in this session yet.</div>
+                        }
+                    </div>
+
+                    <!-- Saved List -->
+                    <div id="panelSaved" class="d-none">
+                        @if (Model.Saved.Any())
+                        {
+                            <div class="list-group list-group-flush">
+                                @foreach (var row in Model.Saved)
+                                {
+                                    <div class="list-group-item">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div class="small">
+                                                <div><strong>@row.Expression</strong></div>
+                                                <div class="text-muted">= @row.Result</div>
+                                            </div>
+                                            <div class="text-nowrap">
+                                                <a asp-action="EditHistory" asp-route-id="@row.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                                                <a asp-action="Delete" asp-route-id="@row.Id" class="btn btn-sm btn-outline-danger ms-1">Delete</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-muted">
+                                @if (string.IsNullOrEmpty(Model.Username))
+                                {
+                                    <span>Sign in to view saved calculations.</span>
+                                }
+                                else
+                                {
+                                    <span>No saved calculations yet.</span>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+    (() => {
+        const display = document.getElementById('display');
+        const allowed = /^[0-9+\-*/().\s]+$/;
+
+        const btnSession = document.getElementById('btnSession');
+        const btnSaved = document.getElementById('btnSaved');
+        const panelSession = document.getElementById('panelSession');
+        const panelSaved = document.getElementById('panelSaved');
+
+        function showPanel(which) {
+            if (which === 'session') {
+                panelSession.classList.remove('d-none');
+                panelSaved.classList.add('d-none');
+                btnSession.classList.add('active');
+                btnSaved.classList.remove('active');
+            } else {
+                panelSession.classList.add('d-none');
+                panelSaved.classList.remove('d-none');
+                btnSession.classList.remove('active');
+                btnSaved.classList.add('active');
+            }
+        }
+
+        btnSession.addEventListener('click', () => showPanel('session'));
+        btnSaved.addEventListener('click', () => showPanel('saved'));
+
+        function write(val) { display.value += val; }
+        function backspace() { display.value = display.value.slice(0, -1); }
+        function clearAll() { display.value = ''; }
+
+        function compute() {
+            const exprRaw = display.value.trim();
+            if (!exprRaw) return null;
+
+            const expr = exprRaw.replace(/×/g, '*').replace(/÷/g, '/');
+            if (!allowed.test(expr)) { alert('Invalid characters in expression.'); return null; }
+
+            try {
+                const result = Function(`"use strict"; return (${expr});`)();
+                if (typeof result !== 'number' || !isFinite(result)) throw new Error('NaN');
+                return { expr: exprRaw, result: String(result) };
+            } catch {
+                alert('Invalid expression.');
+                return null;
+            }
+        }
+
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('button');
+            if (!btn) return;
+
+            const key = btn.getAttribute('data-key');
+            const act = btn.getAttribute('data-act');
+
+            if (key) { write(key); return; }
+            if (act === 'backspace') { backspace(); return; }
+            if (act === 'clear') { clearAll(); return; }
+            if (act === 'equals') {
+                const payload = compute();
+                if (!payload) return;
+
+                // push to both hidden forms
+                document.getElementById('sessionExpression').value = payload.expr;
+                document.getElementById('sessionResult').value = payload.result;
+                document.getElementById('saveExpression').value = payload.expr;
+                document.getElementById('saveResult').value = payload.result;
+
+                // Auto-add to session on "=" (optional)
+                document.getElementById('sessionForm').submit();
+            }
+        });
+
+        // Keyboard support
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') { e.preventDefault(); document.querySelector('[data-act="equals"]')?.click(); }
+            else if (e.key === 'Backspace') { e.preventDefault(); backspace(); }
+            else if (e.key === 'Escape') { e.preventDefault(); clearAll(); }
+            else if (/^[0-9+\-*/().]$/.test(e.key)) { e.preventDefault(); write(e.key); }
+        });
+    })();
+</script>

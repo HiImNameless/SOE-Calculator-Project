@@ -7,7 +7,6 @@
         public int Id { get; set; }             //Primary Key
         public string Expression { get; set; }
         public string Result { get; set; } 
-        public DateTime CreatedAt { get; set; }
 
         // Brandon Lombaard 223021599
         // Foreign Key and Navigation properties

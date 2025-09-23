@@ -61,7 +61,6 @@ namespace SOE_Calculator_Controller.Controllers
             {
                 Username = username.Trim(),
                 Password = password,
-                CreatedAt = DateTime.Now,
             };
 
             // Adds user data to the database
@@ -84,7 +83,6 @@ namespace SOE_Calculator_Controller.Controllers
         public async Task<IActionResult> Login(string username,  string password)
         {
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Username == username && u.Password == password);
-            bool exists = await _db.Users.AnyAsync(u => u.Username == username);
 
             if (user == null)
             {
@@ -109,7 +107,9 @@ namespace SOE_Calculator_Controller.Controllers
         private void SetUserSession(int userId, string username)
         {
             HttpContext.Session.SetInt32(SessionUserIdKey, userId);
-            HttpContext.Session.SetString(SessionUserIdKey, username);
+            // coalesce + trim so we never store null
+            var name = (username ?? string.Empty).Trim();
+            HttpContext.Session.SetString(SessionUsernameKey, name);
         }
 
         // The session history is stored as a JSON file
@@ -151,7 +151,21 @@ namespace SOE_Calculator_Controller.Controllers
         public IActionResult Index()  //This is the default view
         {
             ViewBag.Username = HttpContext.Session.GetString(SessionUsernameKey);
-            return View();
+
+            var vm = new CalculatorPageVM
+            {
+                Username = HttpContext.Session.GetString(SessionUsernameKey),
+                SessionHistory = GetSessionHistory()
+            };
+
+            var userId = GetCurrentUserId();
+
+            if (userId is not null)
+            {
+                vm.Saved = _db.SavedCalculations.Where(c => c.UserId == userId.Value).Take(100).ToList();
+            }
+
+            return View(vm);
         }
 
         [HttpPost]
@@ -169,7 +183,6 @@ namespace SOE_Calculator_Controller.Controllers
             {
                 Expression = expression.Trim(),
                 Result = result.Trim(),
-                CreatedAt = DateTime.Now
             });
 
             // Keeps the session history a certain length (last 20 calculations)
@@ -179,7 +192,7 @@ namespace SOE_Calculator_Controller.Controllers
             }
 
             SaveSessionHistory(history);
-            return RedirectToAction(nameof(ShowHistory));
+            return RedirectToAction(nameof(Index));
         }
 
         // This view displays the history of calculations done in the current session
@@ -187,7 +200,7 @@ namespace SOE_Calculator_Controller.Controllers
          public IActionResult ShowHistory() 
         {
             var history = GetSessionHistory();
-            return View(history);
+            return RedirectToAction(nameof(Index));
         }
         
         // Clears all calculations for the current session (Not saved calculations)
@@ -196,7 +209,7 @@ namespace SOE_Calculator_Controller.Controllers
         public IActionResult ClearSessionHistory()
         {
             HttpContext.Session.Remove(SessionHistoryKey);
-            return RedirectToAction(nameof(ShowHistory));
+            return RedirectToAction(nameof(Index));
         }
 
         // Displays all saved calculations
@@ -210,9 +223,9 @@ namespace SOE_Calculator_Controller.Controllers
                 return RedirectToAction(nameof(Login));
             }
 
-            var list = await _db.SavedCalculations.Where(c => c.UserId == userId.Value).OrderByDescending(c => c.CreatedAt).ToListAsync();
+            var list = await _db.SavedCalculations.Where(c => c.UserId == userId.Value).OrderByDescending(c => c.Id).ToListAsync();
 
-            return View(list);
+            return View(Index);
         }
 
         // Used to save a calculation directly into the database
@@ -244,14 +257,13 @@ namespace SOE_Calculator_Controller.Controllers
             if (duplicate)
             {
                 TempData["Info"] = "This calculation is already saved";
-                return RedirectToAction(nameof(Saved));
+                return RedirectToAction(nameof(Index));
             }
 
             var saved = new SavedCalculation
             {
                 Expression = expression,
                 Result = result,
-                CreatedAt = DateTime.Now,
                 UserId = userId.Value,
             };
 
@@ -259,7 +271,7 @@ namespace SOE_Calculator_Controller.Controllers
             await _db.SaveChangesAsync();
 
             TempData["Success"] = "Calculation saved.";
-            return RedirectToAction(nameof(Saved));
+            return RedirectToAction(nameof(Index));
         }
 
         // Returns the selected calculation to the user for editing
@@ -316,7 +328,7 @@ namespace SOE_Calculator_Controller.Controllers
             await _db.SaveChangesAsync();
 
             TempData["Success"] = "Saved calculation updated";
-            return RedirectToAction(nameof(Saved));
+            return RedirectToAction(nameof(Index));
         }
 
         // Returns the selected calculation for deletion
@@ -357,14 +369,14 @@ namespace SOE_Calculator_Controller.Controllers
             if (calc == null)
             {
                 TempData["Info"] = "That calculation was already deleted or not found.";
-                return RedirectToAction(nameof(Saved));
+                return RedirectToAction(nameof(Index));
             }
 
             _db.SavedCalculations.Remove(calc);
             await _db.SaveChangesAsync();
 
             TempData["Success"] = "Saved calculation deleted";
-            return RedirectToAction(nameof(Saved));
+            return RedirectToAction(nameof(Index));
         }
     }
 }
