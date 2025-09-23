@@ -84,6 +84,7 @@ namespace SOE_Calculator_Controller.Controllers
         public async Task<IActionResult> Login(string username,  string password)
         {
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Username == username && u.Password == password);
+            bool exists = await _db.Users.AnyAsync(u => u.Username == username);
 
             if (user == null)
             {
