@@ -18,7 +18,7 @@ public class DesignFactory : IDesignTimeDbContextFactory<CalculatorDbContext>
 
         var cs = config.GetConnectionString("DefaultConnection");
         Console.WriteLine($"[EF Design] ConnectionString = {cs}");
-
+        ;
         var opts = new DbContextOptionsBuilder<CalculatorDbContext>()
             .UseNpgsql(cs)
             .Options;
