@@ -381,4 +381,51 @@
       // default mode = Arithmetic
       setMode(false);
     })();
+
+//Kamohelo Phatsoane 224090026
+     // --- Voice Recognition Setup ---
+ const voiceBtn = document.getElementById('voiceBtn');
+ const voiceStatus = document.getElementById('voiceStatus');
+ const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+ if (SpeechRecognition) {
+     const recognition = new SpeechRecognition();
+     recognition.lang = 'en-US';
+     recognition.interimResults = false;
+     recognition.maxAlternatives = 1;
+
+     voiceBtn.addEventListener('click', () => {
+         recognition.start();
+         voiceStatus.textContent = 'Listening...';
+     });
+
+     recognition.addEventListener('result', (event) => {
+         const transcript = event.results[0][0].transcript;
+         voiceStatus.textContent = 'Recognized: ' + transcript;
+
+         //Cleans the input
+            let cleaned = transcript.toLowerCase();
+ cleaned = cleaned
+     .replace(/plus/g, '+')
+     .replace(/minus/g, '-')
+     .replace(/times|multiplied by/g, '*')
+     .replace(/divided by|over/g, '/')
+     .replace(/into/g, '*')
+     .replace(/point/g, '.')
+     .replace(/equals/g, '=')
+     .replace(/[^0-9+\-*/().^%= ]/g, ''); 
+         document.getElementById('display').value = cleaned;
+     });
+
+     recognition.addEventListener('speechend', () => {
+         recognition.stop();
+     });
+
+     recognition.addEventListener('error', (event) => {
+         voiceStatus.textContent = 'Error: ' + event.error;
+     });
+ } else {
+     voiceBtn.disabled = true;
+     voiceStatus.textContent = "Voice recognition not supported in this browser.";
+ }
 </script>
