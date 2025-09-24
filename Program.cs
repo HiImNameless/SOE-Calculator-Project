@@ -20,24 +20,16 @@ builder.Services.AddSession(options =>
 
 var app = builder.Build();
 
-app.MapGet("/_db", async (IConfiguration cfg, IServiceProvider sp) =>
+app.MapGet("/_db", (IConfiguration cfg) =>
 {
     var cs = cfg.GetConnectionString("DefaultConnection") ?? "(null)";
     var parts = cs.Split(';', StringSplitOptions.RemoveEmptyEntries);
-    var host = parts.FirstOrDefault(p => p.StartsWith("Host=", StringComparison.OrdinalIgnoreCase)) ?? "Host=?";
-    var port = parts.FirstOrDefault(p => p.StartsWith("Port=", StringComparison.OrdinalIgnoreCase)) ?? "Port=?";
-    try
-    {
-        using var scope = sp.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<SOE_Calculator_Project.Data.CalculatorDbContext>();
-        var ok = await db.Database.CanConnectAsync();
-        return Results.Text($"[DB] {host}; {port}; CanConnect={ok}");
-    }
-    catch (Exception ex)
-    {
-        return Results.Text($"[DB] {host}; {port}; CanConnect=FALSE; {ex.GetType().Name}: {ex.Message}");
-    }
+    var host = parts.FirstOrDefault(p => p.TrimStart().StartsWith("Host=", StringComparison.OrdinalIgnoreCase)) ?? "Host=?";
+    var port = parts.FirstOrDefault(p => p.TrimStart().StartsWith("Port=", StringComparison.OrdinalIgnoreCase)) ?? "Port=?";
+    return Results.Text($"[DB] {host}; {port}");
 });
+
+
 
 if (!app.Environment.IsDevelopment())
 {
