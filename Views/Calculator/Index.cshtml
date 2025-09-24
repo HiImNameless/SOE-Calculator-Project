@@ -31,17 +31,16 @@
                     <div class="mb-3">
                         <input id="display" class="form-control form-control-lg text-end" type="text" placeholder="0" aria-label="Display" readonly />
                     </div>
-
+                    <div class="mb-3 d-flex align-items-center gap-2">
+                        <button type="button" id="voiceBtn" class="btn btn-outline-primary">
+                            <i class="fas fa-microphone"></i> Speak
+                        </button>
+                        <small id="voiceStatus" class="text-muted">Voice input is idle</small>
+                    </div>
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <div class="btn-group btn-group-sm" role="group" aria-label="Mode">
                             <button id="mode-basic" class="btn btn-outline-secondary active">Arithmetic</button>
                             <button id="mode-sci" class="btn btn-outline-secondary">Scientific</button>
-                        </div>
-                        <div class="mb-3 d-flex align-items-center gap-2">
-                            <button type="button" id="voiceBtn" class="btn btn-outline-primary">
-                                <i class="fas fa-microphone"></i> Speak
-                            </button>
-                            <small id="voiceStatus" class="text-muted">Voice input is idle</small>
                         </div>
                     </div>
 
