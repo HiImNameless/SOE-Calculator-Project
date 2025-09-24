@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using SOE_Calculator_Project.Data;
 using SOE_Calculator_Project.Models;
 
-namespace SOE_Calculator_Controller.Controllers
+namespace SOE_Calculator_Project.Controllers  //change made by 224090026 Kamohelo Phatsoane
 {
 
     // Collaborators: Kamohelo Phatsonae 224090026, Brandon Lombaard 223021599
@@ -225,7 +225,7 @@ namespace SOE_Calculator_Controller.Controllers
 
             var list = await _db.SavedCalculations.Where(c => c.UserId == userId.Value).OrderByDescending(c => c.Id).ToListAsync();
 
-            return View();
+            return View();  
         }
 
         // Used to save a calculation directly into the database
@@ -333,7 +333,7 @@ namespace SOE_Calculator_Controller.Controllers
 
         // Returns the selected calculation for deletion
         [HttpGet]
-        public async Task<IActionResult> Delete(int Id)
+        public async Task<IActionResult> Delete(int id)  //fixed Id to id, 224090026 Kamohelo Phatsoane
         {
             int? userId = GetCurrentUserId();
 
@@ -342,7 +342,7 @@ namespace SOE_Calculator_Controller.Controllers
                 return RedirectToAction(nameof(Login));
             }
 
-            var calc = await _db.SavedCalculations.FirstOrDefaultAsync(c => c.Id == Id && c.UserId == userId.Value);
+            var calc = await _db.SavedCalculations.FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId.Value); //fix 224090026
 
             if (calc == null)
             {
