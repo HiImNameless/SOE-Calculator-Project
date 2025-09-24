@@ -13,6 +13,11 @@ builder.Services.AddDbContext<CalculatorDbContext>(options =>
 });
 
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddDbContext<CalculatorDbContext>(opt =>
+    opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")
+ ));
+
 builder.Services.AddSession(options =>
 {
     options.Cookie.HttpOnly = true;
