@@ -378,7 +378,6 @@ namespace SOE_Calculator_Project.Controllers
             TempData["Success"] = "Saved calculation deleted";
             return RedirectToAction(nameof(Index));
         }
-    }
          //Kamohelo Phatsoane 224090026
          //Added Voice input methods
         
