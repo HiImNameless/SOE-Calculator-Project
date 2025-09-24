@@ -379,4 +379,59 @@ namespace SOE_Calculator_Project.Controllers
             return RedirectToAction(nameof(Index));
         }
     }
+         //Kamohelo Phatsoane 224090026
+         //Added Voice input methods
+        
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult CalculatorForm([FromBody] VoiceInputModel model) //Processes voice input for the calculator
+    {
+        if (string.IsNullOrWhiteSpace(model?.VoiceInput))
+            return Json(new { result = "Invalid input" });
+        try
+        {
+            string parsedInput = ParseVoiceInput(model.VoiceInput);
+            double result = EvaluateExpression(parsedInput);
+            return Json(new { result = result });
+
+        }
+        catch
+        {
+            return Json(new { result = "Error" });
+        }
+            
+    }
+
+    private string ParseVoiceInput (string input) //Parses voice input into math expressions
+    {
+        input = input.ToLower();
+
+        var replacements = new Dictionary<string, string>
+        {
+            {"zero", "0" },
+            {"one", "1" },
+            {"two", "2"},
+            {"three", "3" },
+            {"four", "4"},
+            {"five", "5" },
+            {"six", "6" },
+            {"seven", "7" },
+            {"eight", "8" },
+            {"nine", "9" }           
+        };
+
+     
+        foreach (var pair in replacements)
+        {
+            input = input.Replace(pair.Key, pair.Value);
+        }
+        return input;
+    }
+
+    private double EvaluateExpression(string expression) //Computes the result of the calculation
+    {
+         var dataTable = new System.Data.DataTable();
+        return Convert.ToDouble(dataTable.Compute(expression, ""));
+    }
+}
 }
