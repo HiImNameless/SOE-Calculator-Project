@@ -11,4 +11,4 @@ RUN dotnet publish -c Release -o /out
 FROM base AS final
 WORKDIR /app
 COPY --from=build /out .
-ENTRYPOINT ["dotnet","SOE_Calculator_Project.dll"]
+ENTRYPOINT ["dotnet","SOE Calculator Project.dll"]

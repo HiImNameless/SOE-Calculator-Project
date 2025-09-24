@@ -11,8 +11,8 @@ using SOE_Calculator_Project.Data;
 namespace SOE_Calculator_Project.Migrations
 {
     [DbContext(typeof(CalculatorDbContext))]
-    [Migration("20250923123327_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250924142604_InitPostgres")]
+    partial class InitPostgres
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
