@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using SOE_Calculator_Project.Data;
 using SOE_Calculator_Project.Models;
 
-namespace SOE_Calculator_Controller.Controllers
+namespace SOE_Calculator_Project.Controllers
 {
 
     // Collaborators: Kamohelo Phatsonae 224090026, Brandon Lombaard 223021599
