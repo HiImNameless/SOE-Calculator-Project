@@ -4,7 +4,6 @@
     ViewData["Title"] = "Register";
 }
 
-<hr />
 <div class="row">
     <div>
         <h1>Register</h1>
@@ -25,7 +24,7 @@
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
             <div>
-                <a asp-action="Register">Log into your account</a>
+                <a asp-action="Login">Log into your account</a>
             </div>
             <br>
             <div class="form-group">
@@ -41,78 +40,79 @@
 
 <style>
 
-    body {
-        background: linear-gradient(to bottom, #111, #333);
-    }
+body {
+  background: linear-gradient(to left, #00091dff, #470050ff);
+}
 
-    .row {
-        margin: 0;
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: start;
-        align-items: center;
-        background: linear-gradient(to bottom, #111, #333);
-        font-family: Arial, sans-serif;
-        color: #fff;
-        text-align: center;
-    }
+.row {
+  margin: 0;
+  height: 50vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(to Right, #0f172a, #100018ff);
+  font-family: Arial, sans-serif;
+  color: #fff;
+  text-align: center;
+  shadow: dark
+}
 
-    .logo {
-        font-size: 48px;
-        margin-bottom: 40px;
-    }
+.logo {
+  font-size: 48px;
+  margin-bottom: 40px;
+}
 
-    .login-container {
-        width: 100%;
-        max-width: 320px;
-    }
+.login-container {
+  width: 100%;
+  max-width: 320px;
+}
 
-        .login-container h1 {
-            margin-bottom: 10px;
-            font-weight: normal;
-        }
+.login-container h1 {
+  margin-bottom: 10px;
+  font-weight: normal;
+}
 
-    input {
-        width: 100%;
-        padding: 12px;
-        margin: 8px 0;
-        border: none;
-        border-radius: 4px;
-        background: #222;
-        color: #fff;
-    }
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  background: #222;
+  color: #fff;
+}
 
-        input::placeholder {
-            color: #aaa;
-        }
+input::placeholder {
+  color: #aaa;
+}
 
-    button {
-        width: 100%;
-        padding: 12px;
-        border: none;
-        border-radius: 20px;
-        background: #111;
-        color: #fff;
-        font-size: 16px;
-        margin: 12px 0;
-        cursor: pointer;
-    }
+button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 20px;
+  background: #111;
+  color: #fff;
+  font-size: 16px;
+  margin: 12px 0;
+  cursor: pointer;
+}
 
-        button:hover {
-            background: #222;
-        }
+button:hover {
+  background: #222;
+}
 
-    .small-link {
-        font-size: 12px;
-        margin-top: 8px;
-        display: block;
-        color: #ccc;
-        text-decoration: none;
-    }
+.small-link {
+  font-size: 12px;
+  margin-top: 8px;
+  display: block;
+  color: #ccc;
+  text-decoration: none;
+}
 
-        .small-link:hover {
-            color: #fff;
-        }
+.small-link:hover {
+  color: #fff;
+}
 </style>
 

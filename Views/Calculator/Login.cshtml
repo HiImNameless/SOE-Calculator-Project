@@ -4,36 +4,35 @@
     Layout = "_Layout";
     ViewData["Title"] = "Login";
 }
-
-
-
-<hr />
-<div id="login" class="row" >
+<body>
+  <div id="login" class="row" >
     <div><h1>Login</h1></div>
     <br />
     <div class="col-md-4">
-        <form asp-action="Login">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Username" class="control-label"></label>
-                <input asp-for="Username" class="form-control" />
-                <span asp-validation-for="Username" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Password" class="control-label"></label>
-                <input asp-for="Password" class="form-control" type="password" minlength="5" maxlength="25"/>
-                <span asp-validation-for="Password" class="text-danger"></span>
-            </div>
-            <div>
-                <a asp-action="Register">Register an Account</a>
-            </div>
-            <br>
-            <div class="form-group">
-                <input type="submit" value="Login" class="btn btn-primary" />
-            </div>
-        </form>
+      <form asp-action="Login">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+          <label asp-for="Username" class="control-label"></label>
+          <input asp-for="Username" class="form-control" />
+          <span asp-validation-for="Username" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+          <label asp-for="Password" class="control-label"></label>
+          <input asp-for="Password" class="form-control" type="password" minlength="5" maxlength="25"/>
+          <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+        <div>
+          <a asp-action="Register">Register an Account</a>
+        </div>
+        <br>
+        <div class="form-group">
+          <input type="submit" value="Login" class="btn btn-primary" />
+        </div>
+      </form>
     </div>
-</div>
+  </div>
+</body>
+
 
 
 @section Scripts {
@@ -41,20 +40,22 @@
 }
 <style>
 
-    body {
-        background: linear-gradient(to bottom, #111, #333);
-    }
-   .row {
+body {
+  background: linear-gradient(to left, #00091dff, #470050ff);
+}
+
+.row {
   margin: 0;
-  height: 100vh;
+  height: 50vh;
   display: flex;
   flex-direction: column;
-  justify-content: start;
+  justify-content: center;
   align-items: center;
-  background: linear-gradient(to bottom, #111, #333);
+  background: linear-gradient(to Right, #0f172a, #100018ff);
   font-family: Arial, sans-serif;
   color: #fff;
   text-align: center;
+  shadow: dark
 }
 
 .logo {
