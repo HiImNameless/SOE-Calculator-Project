@@ -21,7 +21,7 @@
     {
         <div class="alert alert-danger">@TempData["Error"]</div>
     }
-
+   
     <div class="row g-4">
         <!-- Left: Calculator -->
         <div class="col-12 col-lg-7">
@@ -64,12 +64,12 @@
                         <div class="col-3"><button class="btn btn-outline-secondary w-100" data-key="1">1</button></div>
                         <div class="col-3"><button class="btn btn-outline-secondary w-100" data-key="2">2</button></div>
                         <div class="col-3"><button class="btn btn-outline-secondary w-100" data-key="3">3</button></div>
-                        <div class="col-3"><button class="btn btn-warning w-100" data-key="+">+</button></div>
+                        <div class="col-3"><button class="btn btn-warning  w-100" data-key="+">+</button></div>
 
                         <div class="col-3"><button class="btn btn-outline-secondary w-100" data-key="0">0</button></div>
-                        <div class="col-3"><button class="btn btn-outline-secondary w-100" data-key=".">.</button></div>
-                        <div class="col-3"><button class="btn btn-secondary w-100" data-act="backspace">⌫</button></div>
-                        <div class="col-3"><button class="btn btn-success w-100" data-act="equals">=</button></div>
+                        <div class="col-3"><button class="btn btn-outline-secondary w-100 " data-key=".">.</button></div>
+                        <div class="col-3"><button class="btn btn-secondary w-100 " data-act="backspace">⌫</button></div>
+                        <div class="col-3"><button class="btn btn-success w-100 " data-act="equals">=</button></div>
                     </div>
 
                     <!-- Scientific keypad (hidden in arithmetic mode) -->
@@ -89,7 +89,7 @@
                         <div class="col-3"><button class="btn btn-light w-100" data-op="!">n!</button></div>
                         <div class="col-3"><button class="btn btn-light w-100" data-fn="pow2">x²</button></div>
                     </div>
-
+                    
                     <hr class="my-3" />
 
                     <!-- Actions -->
@@ -429,3 +429,77 @@
      voiceStatus.textContent = "Voice recognition not supported in this browser.";
  }
 </script>
+
+
+
+<script>
+    // Tell Bootstrap to use its dark color variables
+    document.documentElement.setAttribute('data-bs-theme', 'dark');
+</script>
+<style>
+    
+      body {
+        background: radial-gradient(1200px 600px at 20% -10%, #0b1320 10%, transparent 60%),
+                    radial-gradient(900px 500px at 110% 10%, #0f172a 10%, transparent 60%),
+                    #0a0f1a;
+        color: #e5e7eb;
+      }
+
+      
+      .card, .list-group-item {
+        background-color: #0f172a !important;  
+        border-color: #1f2937 !important;      
+        color: #e5e7eb;                         
+      }
+
+       
+      .form-control {
+        background-color: #111827 !important;  
+        border-color: #374151 !important;      
+        color: #e5e7eb !important;
+      }
+      .form-control::placeholder { color: #9ca3af !important; } 
+
+      
+      .btn-light {
+        background-color: #374151 !important;  
+        border-color: #4b5563 !important;      
+        color: #e5e7eb !important;
+      }
+      .btn-outline-secondary {
+        color: #e5e7eb !important;
+        border-color: #6b7280 !important;      
+      }
+      .btn-outline-secondary:hover {
+        background-color: #374151 !important;
+        border-color: #6b7280 !important;
+      }
+
+      
+      .btn-warning { background-color: #f59e0b !important; border: none !important; color: #111827 !important; }
+      .btn-success { background-color: #10b981 !important; border: none !important; }
+      .btn-danger  { background-color: #ef4444 !important; border: none !important; }
+
+      
+      hr { border-color: #1f2937 !important; }
+      .text-muted, small.text-muted { color: #9ca3af !important; }
+
+      
+    .alert-success {
+        background-color: #052e1a;
+        color: #86efac;
+        border-color: #14532d;
+    }
+
+    .alert-info {
+        background-color: #0a2733;
+        color: #7dd3fc;
+        border-color: #164e63;
+    }
+
+    .alert-danger {
+        background-color: #2a0b0b;
+        color: #fecaca;
+        border-color: #7f1d1d;
+    }
+</style>
