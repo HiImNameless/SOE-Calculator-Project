@@ -29,7 +29,7 @@
                 <div class="card-body">
                     <!-- Display -->
                     <div class="mb-3">
-                        <input id="display" class="form-control form-control-lg text-end" type="text" placeholder="0" aria-label="Display" readonly />
+                        <input id="display" class="form-control form-control-lg text-end" type="text" placeholder="0" aria-label="Display" readonly value="@(TempData["LastDisplay"] as string ?? string.Empty)"/>
                     </div>
                     <div class="mb-3 d-flex align-items-center gap-2">
                         <button type="button" id="voiceBtn" class="btn btn-outline-primary">
@@ -45,49 +45,51 @@
                     </div>
 
                     <!-- Keypad -->
-                    <div class="row g-2">
-                        <div class="col-3"><button class="btn btn-light w-100" data-act="clear">C</button></div>
-                        <div class="col-3"><button class="btn btn-light w-100" data-key="(">(</button></div>
-                        <div class="col-3"><button class="btn btn-light w-100" data-key=")">)</button></div>
-                        <div class="col-3"><button class="btn btn-warning w-100" data-key="/">÷</button></div>
+                    <div id="keypadRoot">
+                        <div class="row g-2">
+                            <div class="col-3"><button class="btn btn-light w-100" data-act="clear">C</button></div>
+                            <div class="col-3"><button class="btn btn-light w-100" data-key="(">(</button></div>
+                            <div class="col-3"><button class="btn btn-light w-100" data-key=")">)</button></div>
+                            <div class="col-3"><button class="btn btn-warning w-100" data-key="/">÷</button></div>
 
-                        <div class="col-3"><button class="btn btn-outline-secondary w-100" data-key="7">7</button></div>
-                        <div class="col-3"><button class="btn btn-outline-secondary w-100" data-key="8">8</button></div>
-                        <div class="col-3"><button class="btn btn-outline-secondary w-100" data-key="9">9</button></div>
-                        <div class="col-3"><button class="btn btn-warning w-100" data-key="*">×</button></div>
+                            <div class="col-3"><button class="btn btn-outline-secondary w-100" data-key="7">7</button></div>
+                            <div class="col-3"><button class="btn btn-outline-secondary w-100" data-key="8">8</button></div>
+                            <div class="col-3"><button class="btn btn-outline-secondary w-100" data-key="9">9</button></div>
+                            <div class="col-3"><button class="btn btn-warning w-100" data-key="*">×</button></div>
 
-                        <div class="col-3"><button class="btn btn-outline-secondary w-100" data-key="4">4</button></div>
-                        <div class="col-3"><button class="btn btn-outline-secondary w-100" data-key="5">5</button></div>
-                        <div class="col-3"><button class="btn btn-outline-secondary w-100" data-key="6">6</button></div>
-                        <div class="col-3"><button class="btn btn-warning w-100" data-key="-">−</button></div>
+                            <div class="col-3"><button class="btn btn-outline-secondary w-100" data-key="4">4</button></div>
+                            <div class="col-3"><button class="btn btn-outline-secondary w-100" data-key="5">5</button></div>
+                            <div class="col-3"><button class="btn btn-outline-secondary w-100" data-key="6">6</button></div>
+                            <div class="col-3"><button class="btn btn-warning w-100" data-key="-">−</button></div>
 
-                        <div class="col-3"><button class="btn btn-outline-secondary w-100" data-key="1">1</button></div>
-                        <div class="col-3"><button class="btn btn-outline-secondary w-100" data-key="2">2</button></div>
-                        <div class="col-3"><button class="btn btn-outline-secondary w-100" data-key="3">3</button></div>
-                        <div class="col-3"><button class="btn btn-warning  w-100" data-key="+">+</button></div>
+                            <div class="col-3"><button class="btn btn-outline-secondary w-100" data-key="1">1</button></div>
+                            <div class="col-3"><button class="btn btn-outline-secondary w-100" data-key="2">2</button></div>
+                            <div class="col-3"><button class="btn btn-outline-secondary w-100" data-key="3">3</button></div>
+                            <div class="col-3"><button class="btn btn-warning  w-100" data-key="+">+</button></div>
 
-                        <div class="col-3"><button class="btn btn-outline-secondary w-100" data-key="0">0</button></div>
-                        <div class="col-3"><button class="btn btn-outline-secondary w-100 " data-key=".">.</button></div>
-                        <div class="col-3"><button class="btn btn-secondary w-100 " data-act="backspace">⌫</button></div>
-                        <div class="col-3"><button class="btn btn-success w-100 " data-act="equals">=</button></div>
-                    </div>
+                            <div class="col-3"><button class="btn btn-outline-secondary w-100" data-key="0">0</button></div>
+                            <div class="col-3"><button class="btn btn-outline-secondary w-100 " data-key=".">.</button></div>
+                            <div class="col-3"><button class="btn btn-secondary w-100 " data-act="backspace">⌫</button></div>
+                            <div class="col-3"><button class="btn btn-success w-100 " data-act="equals">=</button></div>
+                        </div>
 
-                    <!-- Scientific keypad (hidden in arithmetic mode) -->
-                    <div id="sci-rows" class="row g-2 d-none">
-                        <div class="col-3"><button class="btn btn-light w-100" data-fn="sin">sin</button></div>
-                        <div class="col-3"><button class="btn btn-light w-100" data-fn="cos">cos</button></div>
-                        <div class="col-3"><button class="btn btn-light w-100" data-fn="tan">tan</button></div>
-                        <div class="col-3"><button class="btn btn-light w-100" data-fn="sqrt">√</button></div>
+                        <!-- Scientific keypad-->
+                        <div id="sci-rows" class="row g-2 d-none">
+                            <div class="col-3"><button class="btn btn-light w-100" data-fn="sin">sin</button></div>
+                            <div class="col-3"><button class="btn btn-light w-100" data-fn="cos">cos</button></div>
+                            <div class="col-3"><button class="btn btn-light w-100" data-fn="tan">tan</button></div>
+                            <div class="col-3"><button class="btn btn-light w-100" data-fn="sqrt">√</button></div>
 
-                        <div class="col-3"><button class="btn btn-light w-100" data-const="pi">π</button></div>
-                        <div class="col-3"><button class="btn btn-light w-100" data-const="e">e</button></div>
-                        <div class="col-3"><button class="btn btn-light w-100" data-op="^">xʸ</button></div>
-                        <div class="col-3"><button class="btn btn-light w-100" data-op="%">%</button></div>
+                            <div class="col-3"><button class="btn btn-light w-100" data-const="pi">π</button></div>
+                            <div class="col-3"><button class="btn btn-light w-100" data-const="e">e</button></div>
+                            <div class="col-3"><button class="btn btn-light w-100" data-op="^">xʸ</button></div>
+                            <div class="col-3"><button class="btn btn-light w-100" data-op="%">%</button></div>
 
-                        <div class="col-3"><button class="btn btn-light w-100" data-fn="log10">log</button></div>
-                        <div class="col-3"><button class="btn btn-light w-100" data-fn="ln">ln</button></div>
-                        <div class="col-3"><button class="btn btn-light w-100" data-op="!">n!</button></div>
-                        <div class="col-3"><button class="btn btn-light w-100" data-fn="pow2">x²</button></div>
+                            <div class="col-3"><button class="btn btn-light w-100" data-fn="log10">log</button></div>
+                            <div class="col-3"><button class="btn btn-light w-100" data-fn="ln">ln</button></div>
+                            <div class="col-3"><button class="btn btn-light w-100" data-op="!">n!</button></div>
+                            <div class="col-3"><button class="btn btn-light w-100" data-fn="pow2">x²</button></div>
+                        </div>
                     </div>
                     
                     <hr class="my-3" />
@@ -233,7 +235,7 @@
         btnSession.addEventListener('click', () => showPanel('session'));
         btnSaved.addEventListener('click', () => showPanel('saved'));
 
-              // ----- Mode toggle -----
+      // ----- Mode toggle -----
       function setMode(sci) {
         if (sci) {
           sciRows.classList.remove('d-none');
@@ -288,22 +290,17 @@
           return null;
         }
 
-        // Replace functions with Math.* and handle degrees if enabled
         const useDegrees = !!degToggle?.checked;
 
-        // Handle factorial: turn "n!" into "fact(n)"
-        // Supports nested: 5!! won’t be supported; single factorial only.
+        // Handle factorial
         expr = expr.replace(/(\d+(?:\.\d+)?)\s*!/g, (_m, n) => `fact(${n})`);
 
-        // Power operator: a^b -> Math.pow(a,b)
-        // Replace ^ with ** for JS, simpler & safe in Function. But we’ll still clamp with Math.pow if you prefer.
+        // Power operator
         expr = expr.replace(/\^/g, '**');
 
-        // Percent: treat trailing % as /100 (e.g., 50% => 0.5)
+        // Percent
         expr = expr.replace(/(\d+(?:\.\d+)?)%/g, (_m, n) => `(${n}/100)`);
 
-        // Map names to Math.*, and provide degree-aware wrappers
-        // We’ll allow sin,cos,tan,log,ln,sqrt explicitly, and PI/e as constants.
         const pre = `
           const PI = Math.PI;
           const e = Math.E;
@@ -321,9 +318,7 @@
           };
         `;
 
-        // Evaluate with a tightly-scoped Function
         try {
-          // eslint-disable-next-line no-new-func
           const fn = Function(`"use strict"; ${pre}; return (${expr});`);
           const result = fn();
           if (typeof result !== 'number' || !isFinite(result)) throw new Error('NaN');
@@ -335,40 +330,47 @@
       }
 
       // ----- Button handling -----
-      document.addEventListener('click', (e) => {
-        const btn = e.target.closest('button');
-        if (!btn) return;
+          // helper to process a button
+    function handleButton(btn) {
+      const key = btn.getAttribute('data-key');
+      const act = btn.getAttribute('data-act');
+      const fn  = btn.getAttribute('data-fn');
+      const cst = btn.getAttribute('data-const');
+      const op  = btn.getAttribute('data-op');
 
-        // existing keys
-        const key = btn.getAttribute('data-key');
-        const act = btn.getAttribute('data-act');
+      if (key) { write(key); return; }
+      if (fn)  { insertFunction(fn); return; }
+      if (cst) { insertConst(cst); return; }
+      if (op)  { insertOp(op); return; }
 
-        // scientific inserts
-        const fn  = btn.getAttribute('data-fn');
-        const cst = btn.getAttribute('data-const');
-        const op  = btn.getAttribute('data-op');
+      if (act === 'backspace') { backspace(); return; }
+      if (act === 'clear')     { clearAll(); return; }
+      if (act === 'equals') {
+        const payload = compute();
+        if (!payload) return;
 
-        if (key) { write(key); return; }
-        if (fn) { insertFunction(fn); return; }
-        if (cst) { insertConst(cst); return; }
-        if (op) { insertOp(op); return; }
+        // show answer in display
+        display.value = `${payload.expr} = ${payload.result}`;
 
-        if (act === 'backspace') { backspace(); return; }
-        if (act === 'clear') { clearAll(); return; }
-        if (act === 'equals') {
-          const payload = compute();
-          if (!payload) return;
+        // push to forms
+        document.getElementById('sessionExpression').value = payload.expr;
+        document.getElementById('sessionResult').value = payload.result;
+        document.getElementById('saveExpression').value = payload.expr;
+        document.getElementById('saveResult').value = payload.result;
 
-          // push to both hidden forms you already have
-          document.getElementById('sessionExpression').value = payload.expr;
-          document.getElementById('sessionResult').value = payload.result;
-          document.getElementById('saveExpression').value = payload.expr;
-          document.getElementById('saveResult').value = payload.result;
+        // add to session history
+        document.getElementById('sessionForm').submit();
+      }
+    }
 
-          // Auto-add to session on "="
-          document.getElementById('sessionForm').submit();
-        }
-      });
+    // 🚀 instant response on phones/tablets/desktops
+    const keypadRoot = document.getElementById('keypadRoot');
+    keypadRoot.addEventListener('pointerdown', (e) => {
+      const btn = e.target.closest('button');
+      if (!btn || !keypadRoot.contains(btn)) return;
+      e.preventDefault();           // avoids 300ms delay / focus jumps
+      handleButton(btn);
+    });
 
       // ----- Keyboard support (basic keys + ^) -----
       document.addEventListener('keydown', (e) => {
@@ -380,54 +382,52 @@
 
       // default mode = Arithmetic
       setMode(false);
+
+     const voiceBtn = document.getElementById('voiceBtn');
+     const voiceStatus = document.getElementById('voiceStatus');
+     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+     if (SpeechRecognition) {
+         const recognition = new SpeechRecognition();
+         recognition.lang = 'en-US';
+         recognition.interimResults = false;
+         recognition.maxAlternatives = 1;
+
+         voiceBtn.addEventListener('click', () => {
+             recognition.start();
+             voiceStatus.textContent = 'Listening...';
+         });
+
+         recognition.addEventListener('result', (event) => {
+             const transcript = event.results[0][0].transcript;
+             voiceStatus.textContent = 'Recognized: ' + transcript;
+
+             //Cleans the input
+                let cleaned = transcript.toLowerCase();
+     cleaned = cleaned
+         .replace(/plus/g, '+')
+         .replace(/minus/g, '-')
+         .replace(/times|multiplied by/g, '*')
+         .replace(/divided by|over/g, '/')
+         .replace(/into/g, '*')
+         .replace(/point/g, '.')
+         .replace(/equals/g, '=')
+         .replace(/[^0-9+\-*/().^%= ]/g, '');
+             document.getElementById('display').value = cleaned;
+         });
+
+         recognition.addEventListener('speechend', () => {
+             recognition.stop();
+         });
+
+         recognition.addEventListener('error', (event) => {
+             voiceStatus.textContent = 'Error: ' + event.error;
+         });
+     } else {
+         voiceBtn.disabled = true;
+         voiceStatus.textContent = "Voice recognition not supported in this browser.";
+     }
     })();
-
-//Kamohelo Phatsoane 224090026
-     // --- Voice Recognition Setup ---
- const voiceBtn = document.getElementById('voiceBtn');
- const voiceStatus = document.getElementById('voiceStatus');
- const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
- if (SpeechRecognition) {
-     const recognition = new SpeechRecognition();
-     recognition.lang = 'en-US';
-     recognition.interimResults = false;
-     recognition.maxAlternatives = 1;
-
-     voiceBtn.addEventListener('click', () => {
-         recognition.start();
-         voiceStatus.textContent = 'Listening...';
-     });
-
-     recognition.addEventListener('result', (event) => {
-         const transcript = event.results[0][0].transcript;
-         voiceStatus.textContent = 'Recognized: ' + transcript;
-
-         //Cleans the input
-            let cleaned = transcript.toLowerCase();
- cleaned = cleaned
-     .replace(/plus/g, '+')
-     .replace(/minus/g, '-')
-     .replace(/times|multiplied by/g, '*')
-     .replace(/divided by|over/g, '/')
-     .replace(/into/g, '*')
-     .replace(/point/g, '.')
-     .replace(/equals/g, '=')
-     .replace(/[^0-9+\-*/().^%= ]/g, ''); 
-         document.getElementById('display').value = cleaned;
-     });
-
-     recognition.addEventListener('speechend', () => {
-         recognition.stop();
-     });
-
-     recognition.addEventListener('error', (event) => {
-         voiceStatus.textContent = 'Error: ' + event.error;
-     });
- } else {
-     voiceBtn.disabled = true;
-     voiceStatus.textContent = "Voice recognition not supported in this browser.";
- }
 </script>
 
 
@@ -455,9 +455,12 @@
         border-color: #374151 !important;      
         color: #e5e7eb !important;
       }
-      .form-control::placeholder { color: #9ca3af !important; } 
+      .form-control::placeholder { color: #9ca3af !important; }
 
-      
+      button, .btn {
+          touch-action: manipulation;
+          -webkit-tap-highlight-color: transparent;
+      }
       .btn-light {
         background-color: #374151 !important;  
         border-color: #4b5563 !important;      

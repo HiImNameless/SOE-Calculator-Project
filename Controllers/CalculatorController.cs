@@ -27,6 +27,11 @@ namespace SOE_Calculator_Project.Controllers
             _db = db;
         }
 
+        public IActionResult Help()
+        {
+            return View();
+        }
+
         [HttpGet]
         public IActionResult Register()
         {
@@ -192,6 +197,7 @@ namespace SOE_Calculator_Project.Controllers
             }
 
             SaveSessionHistory(history);
+            TempData["LastDisplay"] = $"{expression} = {result}";
             return RedirectToAction(nameof(Index));
         }
 
