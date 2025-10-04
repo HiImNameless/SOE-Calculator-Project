@@ -255,7 +255,7 @@
       function backspace() { display.value = display.value.slice(0, -1); }
       function clearAll() { display.value = ''; }
 
-      // Insert function names nicely: clicking 'sin' writes "sin(" etc.
+      // Insert function names
       function insertFunction(name) {
         const map = {
           sin: 'sin(', cos: 'cos(', tan: 'tan(',
@@ -273,7 +273,6 @@
         else if (op === '!') write('!');
       }
 
-      // ----- Safe-ish compute with preprocessing -----
       function compute() {
         let exprRaw = display.value.trim();
         if (!exprRaw) return null;
@@ -330,7 +329,6 @@
       }
 
       // ----- Button handling -----
-          // helper to process a button
     function handleButton(btn) {
       const key = btn.getAttribute('data-key');
       const act = btn.getAttribute('data-act');
@@ -363,7 +361,6 @@
       }
     }
 
-    // 🚀 instant response on phones/tablets/desktops
     const keypadRoot = document.getElementById('keypadRoot');
     keypadRoot.addEventListener('pointerdown', (e) => {
       const btn = e.target.closest('button');
